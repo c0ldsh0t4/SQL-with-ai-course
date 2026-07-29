@@ -52,29 +52,177 @@ VALUES
 
 
 --1. Середній бал по групі: 
+SELECT
+  AVG(AverageMark) AS GroupAverage
+FROM StudentsMarks;
+
+
 --2. Максимальний бал: 
+
+SELECT 
+  MAX(AverageMark) AS MaxMark
+FROM StudentsMarks;
+
 --3. Мінімальний бал:
+SELECT 
+  MIN(AverageMark) AS MinMark
+FROM StudentsMarks;
+
 --4. Середній вік студентів (тут треба використовувати декілька функцій //спойрел :) одна із них DATEDIFF)
 	-- алгоритм: спочатку знаходите різницю між [BirthDate] і сьогоднішним днем в роках а потім обертаемо в функцію пошуку середнього значення :
+SELECT
+    AVG(DATEDIFF(YEAR, BirthDate, GETDATE())) AS AverageAge
+FROM StudentsMarks;
+
 --5. Кількість студентів із пропущеними оцінками:
+
+SELECT COUNT(*) AS Mark
+FROM StudentsMarks
+WHERE AverageMark IS NULL;
+
 --6. Наймолодший студент (вивести поля FirstName, LastName, BirthDate):
+SELECT
+    FirstName,
+    LastName,
+    BirthDate
+FROM StudentsMarks
+WHERE 
+    BirthDate = (
+    SELECT MAX(BirthDate)
+    FROM StudentsMarks
+);
+
+
 --7. Кількість студентів з електронною поштою:
+SELECT COUNT(Email) AS EmailCount
+FROM StudentsMarks;
 
 --8. Пошук довжини рядка (вивести FirstName і друге поле довжина FirstName):
+SELECT
+    FirstName,
+    LEN(FirstName) AS NameLength
+FROM StudentsMarks;
+
 --9. Перетворення рядка у верхній регістр (вивести LastName і друге поле LastName у верхньому регістрі):
+SELECT
+    LastName,
+    UPPER(LastName) AS UpperLastName
+FROM StudentsMarks;
+
 --10. Перетворення рядка в нижній регістр (вивести LastName і друге поле FirstName у нижньому регістрі):
+SELECT
+    LastName,
+    LOWER(FirstName) AS LowerFirstName
+FROM StudentsMarks;
+
 --11. Видалення початкових і кінцевих пробілів в полі City:
+SELECT
+    City,
+    TRIM(City) AS CleanCity
+FROM StudentsMarks;
+
 --12. Витяг підрядка (з поля Email витягти підрядок 10 символів починаю с 1 індекса  //SUBSTRING):
+SELECT
+    Email,
+    SUBSTRING(Email,1,10) AS EmailPart -- Имеет 3 параметра (С какого столбца, начальный индекс ,конечный индекс)
+FROM StudentsMarks;
+
 --13. Поиск позиции подстроки (на якій позиції знаходиться підстрока "gmail" в полі Email, вивести два поля Email і позіцию):
+SELECT
+    Email,
+    CHARINDEX('gmail', Email) AS Position
+FROM StudentsMarks;
+
 --14. Заміна підрядка (в полі PhoneNumber замінити '-' на ''(пусте значення), вивести два поля PhoneNumber і нове поле з заміною):
+SELECT
+    PhoneNumber,
+    REPLACE(PhoneNumber, '-','') AS NewPhoneNumber
+FROM StudentsMarks;
+
 --15. Конкатенація рядків (зробить конкатинацію рядків FirstName, LastName та в дужках день народження  //CONCAT ):
+SELECT
+CONCAT(FirstName, ' ', LastName, ' (', BirthDate, ')') AS FullInfo
+FROM StudentsMarks;
+
 --16. Вивести FirstName, LastName, вік студента, та в який день тижня в нього день народження:
+SELECT
+    FirstName,
+    LastName,
+    DATEDIFF(YEAR, BirthDate, GETDATE()),
+    DATENAME(WEEKDAY, BirthDate)
+FROM StudentsMarks;
+
 --17. Вивести одним полем (через пробіл) поля FirstName, LastName та Email
+SELECT
+    CONCAT(FirstName, ' ', LastName, ' ', Email) AS StudentInfo
+FROM StudentsMarks;
+
 --18. Знайдіть усі групи, які мають більше 2 студентів
+SELECT
+    GroupName,
+    COUNT(*) TotalStudent
+FROM StudentsMarks
+GROUP BY GroupName
+HAVING COUNT(*) > 2;
+
 --19. Визначте групи, в яких середній бал студентів нижчеабо орівнює 80
+SELECT
+    GroupName,
+    AVG(AverageMark) AS AvgMark
+FROM StudentsMarks
+GROUP BY GroupName
+HAVING AVG (AverageMark) <= 80;
+
 --20. Знайти середній бал студентів у кожній групі, але показати лише ті групи, де середній бал більше 70. (враховуйте те що AverageMark може буди null)
+SELECT
+    GroupName,
+    AVG(AverageMark) AS AvgMark
+FROM StudentsMarks
+GROUP BY GroupName
+HAVING AVG(AverageMark) > 70;
+
+--2 Вариант 2 (явная обработка NULL)
+SELECT
+    GroupName,
+    AVG(AverageMark) AS AvgMark
+FROM StudentsMarks
+WHERE AverageMark IS NOT NULL -- WHERE не изменит результат, так как AVG() автоматически игнорирует NULL.
+GROUP BY GroupName
+HAVING AVG(AverageMark) > 70;
+
+
 --21. Вивести студенка і його контакті данні, якщо нема телефона то виводити e-mail, як що нема жодного то вивести "контакти відсутні"
+SELECT
+    FirstName,
+    LastName,
+    COALESCE(PhoneNumber, Email, 'контакти відсутні') AS Contact
+FROM StudentsMarks;
+
 --22. Вивести студенка і його середній бал, якщо немає то вивести "оцінки відсутні"
+SELECT 
+    FirstName,
+    ISNULL(CAST(AverageMark AS VARCHAR(10)),'оцінки відсутні') AS AverageMark
+FROM StudentsMarks; 
+-- Если дальше мы сделаем ORDER BY DESC то порядок вывода будет уже по Алфавиту
+-- Так как тип данных уже строка
+
 --23. Кількість студентів у кожній групі: 
+SELECT 
+    GroupName,
+    COUNT(*) AS TotalStudents
+FROM StudentsMarks
+GROUP BY GroupName;
+
+
 --24. Статистика за країнами (Country і кількість студентів): 
+SELECT
+    Country,
+    COUNT(*) AS TotalStudents
+FROM StudentsMarks
+GROUP BY Country;
+
 --25. Пошук ASCII-коду першого символу в імені:
+SELECT
+    FirstName,
+    ASCII (SUBSTRING(FirstName, 1 , 1)) AS FirstLetterASCII
+FROM StudentsMarks;

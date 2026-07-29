@@ -251,7 +251,7 @@ SELECT Customer.Name,
        Orders.OrderId
 FROM Orders
 INNER JOIN Customers
-ON Customers.CustomerId = Orders.CustomerId
+ON Customers.CustomerId = Orders.CustomerId;
 
 
 SELECT Customers.Name,
@@ -260,7 +260,7 @@ FROM Orders
 INNER JOIN Customers
 ON Customers.CustomerId = Orders.CustomerId
 INNER JOIN Products
-ON Products.ProductId = Orders.ProductId
+ON Products.ProductId = Orders.ProductId;
 
 SELECT 
     Customers.Name,
@@ -271,7 +271,7 @@ FROM Orders
 INNER JOIN Customers
 ON Customers.CustomerId = Orders.CustomerId
 INNER JOIN Products
-ON Products.ProductId = Orders.ProductId
+ON Products.ProductId = Orders.ProductId;
 
 
 SELECT 
@@ -283,7 +283,7 @@ INNER JOIN Customers
 ON Customers.CustomerId = Orders.CustomerId
 INNER JOIN Products
 ON Products.ProductId = Orders.ProductId
-WHERE Products.Price > 1000
+WHERE Products.Price > 1000;
 
 
 SELECT
@@ -292,7 +292,7 @@ SELECT
 FROM Orders
 INNER JOIN Customers
 ON Customers.CustomerId = Orders.CustomerId
-GROUP BY (Customers.Name)
+GROUP BY (Customers.Name);
 
 
 SELECT 
@@ -303,7 +303,7 @@ INNER JOIN Customers
 ON Customers.CustomerId = Orders.CustomerId
 INNER JOIN Products
 ON Products.ProductId = Orders.ProductId
-GROUP BY Customers.Name
+GROUP BY Customers.Name;
 
 
 SELECT 
@@ -315,7 +315,7 @@ ON Customers.CustomerId = Orders.CustomerId
 INNER JOIN Products
 ON Products.ProductId = Orders.ProductId
 WHERE Products.Price > 1000
-GROUP BY Customers.Name
+GROUP BY Customers.Name;
 
 
 SELECT 
@@ -326,7 +326,8 @@ INNER JOIN Customers
 ON Customers.CustomerId = Orders.CustomerId
 INNER JOIN Products
 ON Products.ProductId = Orders.ProductId
-GROUP BY Customers.Name
+GROUP BY Customers.Name;
+
 
 SELECT 
     Students.Name AS Student,
@@ -335,7 +336,7 @@ FROM Enrollments
 INNER JOIN Students
 ON Students.StudentId = Enrollments.StudentId
 INNER JOIN Courses
-ON Courses.CourseId = Enrollments.CourseId
+ON Courses.CourseId = Enrollments.CourseId;
 
 
 SELECT 
@@ -344,7 +345,8 @@ SELECT
 FROM Enrollments
 INNER JOIN Courses
 ON Courses.CourseId = Enrollments.CourseId
-GROUP BY CourseName
+GROUP BY CourseName;
+
 
 SELECT 
     Courses.CourseName AS Course,
@@ -352,4 +354,15 @@ SELECT
 FROM Enrollments
 INNER JOIN Courses
 ON Courses.CourseId = Enrollments.CourseId
-GROUP BY Courses.CourseName
+GROUP BY Courses.CourseName;
+
+
+SELECT
+    Teachers.Name,
+    COUNT(*) AS CoursesCount
+FROM Courses
+INNER JOIN Teachers
+ON Courses.TeacherId = Teachers.TeacherId
+GROUP BY Teachers.Name;
+
+
