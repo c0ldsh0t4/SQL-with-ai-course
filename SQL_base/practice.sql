@@ -365,4 +365,64 @@ INNER JOIN Teachers
 ON Courses.TeacherId = Teachers.TeacherId
 GROUP BY Teachers.Name;
 
+--------------------ПОДЗАПРОСЫ-------------------
+--=============================================--
 
+SELECT
+    FirstName,
+    LastName,
+    AverageMark
+FROM StudentsMarks
+WHERE AverageMark = (
+    SELECT MAX(AverageMark)
+    FROM StudentsMarks
+);
+
+
+SELECT
+    FirstName,
+    LastName,
+    AverageMark
+FROM StudentsMarks
+WHERE AverageMark < (
+    SELECT AVG(AverageMark)
+    FROM StudentsMarks
+);
+
+
+SELECT
+    FirstName,
+    AverageMark,
+    Country
+FROM StudentsMarks
+WHERE  Country IN (
+    SELECT Country
+    FROM StudentsMarks
+    WHERE AverageMark > 90
+);
+
+
+SELECT
+    FirstName,
+    AverageMark,
+    Country
+FROM StudentsMarks
+WHERE Country 
+NOT IN (
+    SELECT Country
+    FROM StudentsMarks
+    WHERE AverageMark > 90
+);
+
+
+SELECT
+    FirstName,
+    LastName,
+    AverageMark,
+    Country
+FROM StudentsMarks
+WHERE AverageMark IN (
+    SELECT AverageMark
+    FROM StudentsMarks
+    WHERE Country = 'Ukraine'
+);

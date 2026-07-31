@@ -226,3 +226,4 @@ SELECT
     FirstName,
     ASCII (SUBSTRING(FirstName, 1 , 1)) AS FirstLetterASCII
 FROM StudentsMarks;
+
