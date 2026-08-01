@@ -281,20 +281,145 @@ GROUP BY Brand,Model;
 
 
 -- 13. Знайти власників, чиї авто мають двигун > 2000 см?
+SELECT
+	OwnerName
+FROM Owners
+INNER JOIN Cars
+ON Cars.OwnerID = Owners.OwnerID
+WHERE EngineSize > 2000;
 -- 14. Вивести всі авто з інформацією про останній техогляд (через підзапит)
+SELECT
+	Brand,
+	Model,
+(SELECT MAX(InspectionDate) 
+FROM Inspections 
+WHERE Inspections.CarID = Cars.CarID) AS LastInspection
+FROM Cars;
 -- 15. Знайти авто без штрафів
+SELECT
+	Brand,
+	Model
+FROM Cars
+LEFT JOIN Fines
+ON Fines.CarID = Cars.CarID
+WHERE FineAmount IS NULL;
 -- 16. Вивести власників з кількістю авто та штрафів
+SELECT
+	OwnerName,
+	COUNT(DISTINCT Cars.CarID) AS TotalCars,
+	COUNT(Fines.FineID) AS TotalFines
+FROM Owners
+LEFT JOIN Cars
+ON Cars.OwnerID = Owners.OwnerID
+LEFT JOIN Fines
+ON Fines.CarID = Cars.CarID
+GROUP BY OwnerName;
 -- 17. Знайти найстаріший автомобіль у базі
--- 18. Вивести середню ціну авто за рік випуску
--- 19. Знайти власників, де сума штрафів > середньої
--- 20. Вивести всі авто з вказанням кількості техоглядів
+SELECT
+	Brand,
+	Model,
+	Year
+FROM Cars
+WHERE Year = (SELECT MIN(Year) FROM Cars);
 
+-- 18. Вивести середню ціну авто за рік випуску
+SELECT
+	Year,
+	AVG(Price) AS AveragePrice
+FROM Cars
+GROUP BY Year;
+-- 19. Знайти власників, де сума штрафів > середньої
+SELECT
+	OwnerName,
+	SUM(FineAmount) AS TotalFines
+FROM Owners
+LEFT JOIN Cars
+ON Cars.OwnerID = Owners.OwnerID
+LEFT JOIN Fines
+ON Fines.CarID = Cars.CarID
+GROUP BY OwnerName
+HAVING SUM(FineAmount) > (SELECT AVG(TotalFines) 
+FROM (SELECT SUM(FineAmount) AS TotalFines 
+FROM Owners 
+LEFT JOIN Cars 
+ON Cars.OwnerID = Owners.OwnerID 
+LEFT JOIN Fines 
+ON Fines.CarID = Cars.CarID 
+GROUP BY OwnerName) AS AvgFines);
+
+-- 20. Вивести всі авто з вказанням кількості техоглядів
+SELECT
+	Brand,
+	Model,
+	COUNT(InspectionId) AS TotalInspections
+FROM Cars
+LEFT JOIN Inspections
+ON Inspections.CarID = Cars.CarID
+GROUP BY Brand, Model;
 
 
 -- Додаткові СКЛАДНІ питання!!!! (не обов'язкові для виконання)
 -- 21. Знайти власників, чиї автомобілі мають техогляди, але не мають штрафів
--- 22. Вивести автомобілі з кількістю техоглядів та загальною сумою штрафів
--- 23. Знайти рік з найбільшою кількістю техоглядів та штрафів
--- 24. Вивести власників, у яких всі автомобілі мають техогляди
--- 25. Знайти власників, чиї авто мають більше 1 техогляду та середній штраф понад 200 грн
+SELECT
+	OwnerName
+FROM Owners
+LEFT JOIN Cars
+ON Cars.OwnerID = Owners.OwnerID
+LEFT JOIN Inspections
+ON Inspections.CarID = Cars.CarID
+LEFT JOIN Fines
+ON Fines.CarID = Cars.CarID
+WHERE Inspections.InspectionID IS NOT NULL 
+AND Fines.FineID IS NULL;
 
+-- 22. Вивести автомобілі з кількістю техоглядів та загальною сумою штрафів
+SELECT
+	Brand,
+	Model,
+	COUNT(DISTINCT Inspections.InspectionID) AS TotalInspections,
+	SUM(Fines.FineAmount) AS TotalFines
+FROM Cars
+LEFT JOIN Inspections
+ON Inspections.CarID = Cars.CarID
+LEFT JOIN Fines
+ON Fines.CarID = Cars.CarID
+GROUP BY Brand, Model;
+
+-- 23. Знайти рік з найбільшою кількістю техоглядів та штрафів
+SELECT TOP 1
+	Year,
+	COUNT(DISTINCT Inspections.InspectionID) AS TotalInspections,
+	COUNT(DISTINCT Fines.FineID) AS TotalFines
+FROM Cars
+LEFT JOIN Inspections
+ON Inspections.CarID = Cars.CarID
+LEFT JOIN Fines
+ON Fines.CarID = Cars.CarID
+GROUP BY Year
+ORDER BY (COUNT(DISTINCT Inspections.InspectionID) + COUNT(DISTINCT Fines.FineID)) DESC;
+
+-- 24. Вивести власників, у яких всі автомобілі мають техогляди
+SELECT
+	OwnerName
+FROM Owners
+LEFT JOIN Cars
+ON Cars.OwnerID = Owners.OwnerID
+LEFT JOIN Inspections
+ON Inspections.CarID = Cars.CarID
+GROUP BY OwnerName
+HAVING COUNT(DISTINCT Cars.CarID) = COUNT(DISTINCT Inspections.CarID);
+
+-- 25. Знайти власників, чиї авто мають більше 1 техогляду та середній штраф понад 200 грн
+SELECT
+	OwnerName,
+	AVG(Fines.FineAmount) AS AverageFine
+FROM Owners
+LEFT JOIN Cars
+ON Cars.OwnerID = Owners.OwnerID
+LEFT JOIN Inspections
+ON Inspections.CarID = Cars.CarID
+LEFT JOIN Fines
+ON Fines.CarID = Cars.CarID
+GROUP BY OwnerName
+HAVING COUNT(DISTINCT Inspections.InspectionID) > 1 AND AVG(Fines.FineAmount) > 200
+;
