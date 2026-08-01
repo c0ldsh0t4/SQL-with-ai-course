@@ -16,6 +16,12 @@ GO
 
 -- Перевірити всі лі ключи присутні!!!! Як що треба то додати.
 
+-- Створення таблиці Owners
+CREATE TABLE Owners (
+	OwnerID INT PRIMARY KEY,
+	OwnerName NVARCHAR(100)
+);
+
 -- Створення таблиці Cars
 CREATE TABLE Cars (
 	CarID INT PRIMARY KEY,
@@ -24,21 +30,17 @@ CREATE TABLE Cars (
 	Year INT,
 	EngineSize INT,
 	Price DECIMAL(10, 2),
-	OwnerID INT
+	OwnerID INT,
+	FOREIGN KEY (OwnerID) REFERENCES Owners(OwnerID)
 );
 
--- Створення таблиці Owners
-CREATE TABLE Owners (
-	OwnerID INT PRIMARY KEY
-,	OwnerName NVARCHAR(100)
-);
 
 -- Створення таблиці Inspections
 CREATE TABLE Inspections (
-	InspectionID INT PRIMARY KEY
-,	CarID INT
-,	InspectionDate DATE
-,	FOREIGN KEY (CarID) REFERENCES Cars(CarID)
+	InspectionID INT PRIMARY KEY,
+	CarID INT,
+	InspectionDate DATE,
+	FOREIGN KEY (CarID) REFERENCES Cars(CarID)
 );
 
 -- Створення таблиці Fines (штрафи)
